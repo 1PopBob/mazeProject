@@ -14,6 +14,7 @@ int maze_search(char**, int, int);
 // main function to read, solve maze, and print result
 int main(int argc, char* argv[]) {
     int rows, cols, result;
+    int *r = &rows, *c = &cols;
     char** mymaze=NULL;
 
     if(argc < 2)
@@ -22,14 +23,16 @@ int main(int argc, char* argv[]) {
        return 1;
     }
 
-    mymaze = &argv[1];// <---TASK: COMPLETE THIS FOR CHECKPOINT 1
+    //cout << argv[1] << endl;
 
-
+    mymaze = read_maze(argv[1], r, c);// <---TASK: COMPLETE THIS FOR CHECKPOINT 1
 
     if (mymaze == NULL) {
       cout << "Error, input format incorrect." << endl;
       return 1;
     }
+
+
      //================================
     // When working on Checkpoint 4, you will call maze_search here.
     // But for Checkpoint 1, just assume we found the path.
