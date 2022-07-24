@@ -23,18 +23,16 @@ Queue::~Queue() {
 void Queue::add_to_back(Location loc) {
 	
    // *** You complete **** CHECKPOINT 3
-  
-  
-	
+  contents[tail] = loc;
+  tail++;
 }
 
 //Return and "remove" the oldest Location not already extracted
 Location Queue::remove_from_front() {
-  
-   // *** You complete **** CHECKPOINT 3
-  
-  
-  
+    // *** You complete **** CHECKPOINT 3
+    int temp = head;
+    head++;
+    return contents[temp];
 }
 
 //Is this Queue empty? (did we extract everything added?)
