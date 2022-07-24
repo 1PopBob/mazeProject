@@ -54,10 +54,11 @@ int main(int argc, char* argv[]) {
      //================================
     // ADD CODE BELOW
     // to delete all memory that read_maze allocated: CHECKPOINT 2
-
-
-
-
+    for(int i = 0; i < rows; i++)
+    {
+        delete[] mymaze[i];
+    }
+    delete[] mymaze;
 
     return 0;
 }
