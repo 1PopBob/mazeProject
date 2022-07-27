@@ -4,7 +4,7 @@ maze.cpp
 
 #include <iostream>
 #include "mazeio.h"
-// #include "queue.h"
+#include "queue.h"
 
 using namespace std;
 
@@ -23,8 +23,6 @@ int main(int argc, char* argv[]) {
        return 1;
     }
 
-    //cout << argv[1] << endl;
-
     mymaze = read_maze(argv[1], r, c);// <---TASK: COMPLETE THIS FOR CHECKPOINT 1
 
     if (mymaze == NULL) {
@@ -37,8 +35,7 @@ int main(int argc, char* argv[]) {
     // When working on Checkpoint 4, you will call maze_search here.
     // But for Checkpoint 1, just assume we found the path.
 
-    result = 1; // <--- TASK: CHANGE THIS FOR CHECKPOINT 4
-
+    result = maze_search(mymaze, rows, cols); // <--- TASK: CHANGE THIS FOR CHECKPOINT 4
 
     // examine value returned by maze_search and print appropriate output
     if (result == 1) { // path found!
@@ -75,13 +72,64 @@ int main(int argc, char* argv[]) {
  *************************************************/
 int maze_search(char** maze, int rows, int cols) 
 {
-  // *** You complete **** CHECKPOINT 4
-  
-  
-  
-  
-  
-  
-  
-  return 0; // DELETE this stub, it's just for Checkpoint 1 to compile.
+    // *** You complete **** CHECKPOINT 4
+    Queue q(rows*cols);
+    Location start;
+    Location current;
+    Location *explored = new Location[rows*cols];
+    Location **predecessor = new Location*[rows];
+    for(int i = 0; i < rows; i++)
+    {
+        predecessor[i] = new Location[cols];
+    }
+
+    // find starting position in maze
+    for(int i = 0; i < rows; i++)
+    {
+        for(int j = 0; j < cols; j++)
+        {
+            if(maze[i][j] == 'S')
+            {
+                start.row = i;
+                start.col = j;
+                q.add_to_back(start);
+                explored[0] = start;
+                break;
+            }
+        }
+    }
+
+    while(!q.is_empty())
+    {
+        current = q.remove_from_front();
+        // north: -1 row AND -1 col
+        // west: -1 col
+        // south: +1 row AND +1 col
+        // east: +1 col
+
+        if(current.row - 1 >= 0 && current.col - 1 >= 0)
+        {
+            start.row = current.row - 1;
+            start.col = current.col - 1;
+            q.add_to_back(start);
+        }
+        if(current.col - 1 >= 0)
+        {
+            start.col = current.col - 1;
+            q.add_to_back(start);
+        }
+        if(current.row + 1 < rows && current.col + 1 < cols)
+        {
+            start.row = current.row + 1;
+            start.col = current.col + 1;
+            q.add_to_back(start);
+        }
+        if(current.col + 1 < cols)
+        {
+            start.col = current.col + 1;
+            q.add_to_back(start);
+        }
+    }
+
+    return 0;
 }
