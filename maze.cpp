@@ -10,6 +10,9 @@ using namespace std;
 
 // Prototype for maze_search, which you will fill in below.
 int maze_search(char**, int, int);
+bool checkDuplicate(Location, int*, Location*);
+bool addToExplored(Location, int*, Location*);
+void addToPredecessor();
 
 // main function to read, solve maze, and print result
 int main(int argc, char* argv[]) {
@@ -99,8 +102,8 @@ int maze_search(char** maze, int rows, int cols)
         }
     }
 
-    int exIndex = 1;
-    bool duplicate = false;
+    int exploredIndex = 1;
+    int* size = &exploredIndex;
     while(!q.is_empty())
     {
         current = q.remove_from_front();
@@ -113,43 +116,53 @@ int maze_search(char** maze, int rows, int cols)
         {
             next.row = current.row - 1;
             next.col = current.col - 1;
-            for(int i = 0; i <= exIndex; i++)
-            {
-                Location temp = explored[i];
-                if(temp.row == next.row && temp.col == next.col)
-                {
-                    duplicate = true;
-                }
-            }
-            if(!duplicate)
-            {
-                q.add_to_back(next);
-                explored[exIndex] = next;
-                exIndex++;
-            }
+            addToExplored(next, size, explored);
+            q.add_to_back(next);
         }
         if(current.col - 1 >= 0)
         {
             next.col = current.col - 1;
+            addToExplored(next, size, explored);
             q.add_to_back(next);
-            explored[exIndex] = next;
-            exIndex++;
         }
         if(current.row + 1 < rows && current.col + 1 < cols)
         {
             next.row = current.row + 1;
             next.col = current.col + 1;
+            addToExplored(next, size, explored);
             q.add_to_back(next);
-            explored[exIndex] = next;
-            exIndex++;
         }
         if(current.col + 1 < cols)
         {
             next.col = current.col + 1;
+            addToExplored(next, size, explored);
             q.add_to_back(next);
-            explored[exIndex] = next;
-            exIndex++;
         }
     }
     return 0;
+}
+
+bool addToExplored(Location next, int* size, Location* explored)
+{
+    bool add = checkDuplicate(next, size, explored);
+    if(add)
+    {
+        explored[*size] = next;
+        (*size)++;
+    }
+    return add;
+}
+
+bool checkDuplicate(Location next, int* size, Location *explored)
+{
+    bool duplicate = false;
+    for(int i = 0; i <= *size; i++)
+    {
+        Location temp = explored[i];
+        if(temp.row == next.row && temp.col == next.col)
+        {
+            duplicate = true;
+        }
+    }
+    return duplicate;
 }
