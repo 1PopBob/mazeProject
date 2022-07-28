@@ -74,7 +74,7 @@ int maze_search(char** maze, int rows, int cols)
 {
     // *** You complete **** CHECKPOINT 4
     Queue q(rows*cols);
-    Location start;
+    Location next;
     Location current;
     Location *explored = new Location[rows*cols];
     Location **predecessor = new Location*[rows];
@@ -90,15 +90,17 @@ int maze_search(char** maze, int rows, int cols)
         {
             if(maze[i][j] == 'S')
             {
-                start.row = i;
-                start.col = j;
-                q.add_to_back(start);
-                explored[0] = start;
+                next.row = i;
+                next.col = j;
+                q.add_to_back(next);
+                explored[0] = next;
                 break;
             }
         }
     }
 
+    int exIndex = 1;
+    bool duplicate = false;
     while(!q.is_empty())
     {
         current = q.remove_from_front();
@@ -109,27 +111,45 @@ int maze_search(char** maze, int rows, int cols)
 
         if(current.row - 1 >= 0 && current.col - 1 >= 0)
         {
-            start.row = current.row - 1;
-            start.col = current.col - 1;
-            q.add_to_back(start);
+            next.row = current.row - 1;
+            next.col = current.col - 1;
+            for(int i = 0; i <= exIndex; i++)
+            {
+                Location temp = explored[i];
+                if(temp.row == next.row && temp.col == next.col)
+                {
+                    duplicate = true;
+                }
+            }
+            if(!duplicate)
+            {
+                q.add_to_back(next);
+                explored[exIndex] = next;
+                exIndex++;
+            }
         }
         if(current.col - 1 >= 0)
         {
-            start.col = current.col - 1;
-            q.add_to_back(start);
+            next.col = current.col - 1;
+            q.add_to_back(next);
+            explored[exIndex] = next;
+            exIndex++;
         }
         if(current.row + 1 < rows && current.col + 1 < cols)
         {
-            start.row = current.row + 1;
-            start.col = current.col + 1;
-            q.add_to_back(start);
+            next.row = current.row + 1;
+            next.col = current.col + 1;
+            q.add_to_back(next);
+            explored[exIndex] = next;
+            exIndex++;
         }
         if(current.col + 1 < cols)
         {
-            start.col = current.col + 1;
-            q.add_to_back(start);
+            next.col = current.col + 1;
+            q.add_to_back(next);
+            explored[exIndex] = next;
+            exIndex++;
         }
     }
-
     return 0;
 }
