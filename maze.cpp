@@ -81,6 +81,8 @@ int maze_search(char** maze, int rows, int cols)
     Location current;
     Location *explored = new Location[rows*cols];
     Location **predecessor = new Location*[rows];
+    int startFinish = 0;
+
     for(int i = 0; i < rows; i++)
     {
         predecessor[i] = new Location[cols];
@@ -97,9 +99,22 @@ int maze_search(char** maze, int rows, int cols)
                 next.col = j;
                 q.add_to_back(next);
                 explored[0] = next;
-                break;
+                startFinish++;
+            }
+            if(maze[i][j] == 'F')
+            {
+                startFinish++;
             }
         }
+    }
+
+    if(startFinish < 2)
+    {
+        return 0;
+    }
+    else if(startFinish > 2)
+    {
+        return -1;
     }
 
     int exploredIndex = 1;
@@ -147,7 +162,7 @@ int maze_search(char** maze, int rows, int cols)
             }
         }
     }
-    return 0;
+    return 1;
 }
 
 bool addToExplored(Location next, int* size, Location* explored)
