@@ -12,7 +12,7 @@ using namespace std;
 int maze_search(char**, int, int);
 bool checkDuplicate(Location, const int*, Location*);
 bool addToExplored(Location, int*, Location*);
-void addToPredecessor(Location, char**);
+void backtracking(Location**, char**, Location, int);
 
 // main function to read, solve maze, and print result
 int main(int argc, char* argv[]) {
@@ -62,7 +62,7 @@ int main(int argc, char* argv[]) {
 
     return 0;
 }
-//
+
 /**************************************************
  * Attempt to find shortest path and return:
  *  1 if successful
@@ -73,12 +73,18 @@ int main(int argc, char* argv[]) {
  *  but don't overwrite the 'S' and 'F' cells
  * NOTE: don't forget to deallocate memory in here too!
  *************************************************/
+
+// Things to consider
+// ending up at dead end in maze
+// how to backtrack from dead end
+// how to find optimal path
 int maze_search(char** maze, int rows, int cols) 
 {
     // *** You complete **** CHECKPOINT 4
     Queue q(rows*cols);
     Location next;
     Location current;
+    Location finish;
     Location *explored = new Location[rows*cols];
     Location **predecessor = new Location*[rows];
     int startFinish = 0;
@@ -103,6 +109,8 @@ int maze_search(char** maze, int rows, int cols)
             }
             if(maze[i][j] == 'F')
             {
+                finish.row = i;
+                finish.col = j;
                 startFinish++;
             }
         }
@@ -122,53 +130,76 @@ int maze_search(char** maze, int rows, int cols)
     while(!q.is_empty())
     {
         current = q.remove_from_front();
-        // north: -1 row AND -1 col
+        // north: -1 row
         // west: -1 col
-        // south: +1 row AND +1 col
+        // south: +1 row
         // east: +1 col
 
-        if(current.row - 1 >= 0 && current.col - 1 >= 0)
+        if(current.row - 1 >= 0)
         {
             next.row = current.row - 1;
             next.col = current.col - 1;
-            if(addToExplored(next, size, explored))
+            if(maze[next.row][next.col] != '#')
             {
-                q.add_to_back(next);
+                if(!addToExplored(next, size, explored))
+                {
+                    q.add_to_back(next);
+                    predecessor[next.row][next.col] = current;
+                }
             }
+
         }
         if(current.col - 1 >= 0)
         {
             next.col = current.col - 1;
-            if(addToExplored(next, size, explored))
+            if(maze[next.row][next.col] != '#')
             {
-                q.add_to_back(next);
+                if(!addToExplored(next, size, explored))
+                {
+                    q.add_to_back(next);
+                    predecessor[next.row][next.col] = current;
+                }
             }
         }
-        if(current.row + 1 < rows && current.col + 1 < cols)
+        if(current.row + 1 < rows)
         {
             next.row = current.row + 1;
             next.col = current.col + 1;
-            if(addToExplored(next, size, explored))
+            if(maze[next.row][next.col] != '#')
             {
-                q.add_to_back(next);
+                if(!addToExplored(next, size, explored))
+                {
+                    q.add_to_back(next);
+                    predecessor[next.row][next.col] = current;
+                }
             }
         }
         if(current.col + 1 < cols)
         {
             next.col = current.col + 1;
-            if(addToExplored(next, size, explored))
+            if(maze[next.row][next.col] != '#')
             {
-                q.add_to_back(next);
+                if(!addToExplored(next, size, explored))
+                {
+                    q.add_to_back(next);
+                    predecessor[next.row][next.col] = current;
+                }
             }
         }
+
+        // time to add backtracking
+        // if at dead end queue will pop to a cell atleast one space away from dead end
+        // if pop with atleast one space inbetween cells delete breadcrumbs
+        //
     }
+    backtracking(predecessor, maze, finish, *size);
     return 1;
 }
 
 bool addToExplored(Location next, int* size, Location* explored)
 {
     bool add = checkDuplicate(next, size, explored);
-    if(add)
+    if(!add)
     {
         explored[*size] = next;
         (*size)++;
@@ -179,7 +210,7 @@ bool addToExplored(Location next, int* size, Location* explored)
 bool checkDuplicate(Location next, const int* size, Location *explored)
 {
     bool duplicate = false;
-    for(int i = 0; i <= *size; i++)
+    for(int i = 0; i < *size; i++)
     {
         Location temp = explored[i];
         if(temp.row == next.row && temp.col == next.col)
@@ -188,4 +219,20 @@ bool checkDuplicate(Location next, const int* size, Location *explored)
         }
     }
     return duplicate;
+}
+
+void backtracking(Location** predecessor, char** maze, Location finish, int size)
+{
+    Location back = finish;
+    for(int i = 0; i < size; i++)
+    {
+        /*if(i == 0)
+        {
+            back = predecessor[finish.row][finish.col];
+            maze[back.row][back.col] = '*';
+        }*/
+        back = predecessor[back.row][back.col];
+        // bug with predecessor array: it is not initialized properly
+        maze[back.row][back.col] = '*';
+    }
 }
