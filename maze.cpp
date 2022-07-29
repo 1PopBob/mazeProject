@@ -10,9 +10,9 @@ using namespace std;
 
 // Prototype for maze_search, which you will fill in below.
 int maze_search(char**, int, int);
-bool checkDuplicate(Location, int*, Location*);
+bool checkDuplicate(Location, const int*, Location*);
 bool addToExplored(Location, int*, Location*);
-void addToPredecessor();
+void addToPredecessor(Location, char**);
 
 // main function to read, solve maze, and print result
 int main(int argc, char* argv[]) {
@@ -116,27 +116,35 @@ int maze_search(char** maze, int rows, int cols)
         {
             next.row = current.row - 1;
             next.col = current.col - 1;
-            addToExplored(next, size, explored);
-            q.add_to_back(next);
+            if(addToExplored(next, size, explored))
+            {
+                q.add_to_back(next);
+            }
         }
         if(current.col - 1 >= 0)
         {
             next.col = current.col - 1;
-            addToExplored(next, size, explored);
-            q.add_to_back(next);
+            if(addToExplored(next, size, explored))
+            {
+                q.add_to_back(next);
+            }
         }
         if(current.row + 1 < rows && current.col + 1 < cols)
         {
             next.row = current.row + 1;
             next.col = current.col + 1;
-            addToExplored(next, size, explored);
-            q.add_to_back(next);
+            if(addToExplored(next, size, explored))
+            {
+                q.add_to_back(next);
+            }
         }
         if(current.col + 1 < cols)
         {
             next.col = current.col + 1;
-            addToExplored(next, size, explored);
-            q.add_to_back(next);
+            if(addToExplored(next, size, explored))
+            {
+                q.add_to_back(next);
+            }
         }
     }
     return 0;
@@ -153,7 +161,7 @@ bool addToExplored(Location next, int* size, Location* explored)
     return add;
 }
 
-bool checkDuplicate(Location next, int* size, Location *explored)
+bool checkDuplicate(Location next, const int* size, Location *explored)
 {
     bool duplicate = false;
     for(int i = 0; i <= *size; i++)
