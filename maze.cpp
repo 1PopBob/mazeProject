@@ -138,7 +138,7 @@ int maze_search(char** maze, int rows, int cols)
         if(current.row - 1 >= 0)
         {
             next.row = current.row - 1;
-            next.col = current.col - 1;
+            next.col = current.col;
             if(maze[next.row][next.col] != '#')
             {
                 if(!addToExplored(next, size, explored))
@@ -151,6 +151,7 @@ int maze_search(char** maze, int rows, int cols)
         }
         if(current.col - 1 >= 0)
         {
+            next.row = current.row;
             next.col = current.col - 1;
             if(maze[next.row][next.col] != '#')
             {
@@ -164,7 +165,7 @@ int maze_search(char** maze, int rows, int cols)
         if(current.row + 1 < rows)
         {
             next.row = current.row + 1;
-            next.col = current.col + 1;
+            next.col = current.col;
             if(maze[next.row][next.col] != '#')
             {
                 if(!addToExplored(next, size, explored))
@@ -176,6 +177,7 @@ int maze_search(char** maze, int rows, int cols)
         }
         if(current.col + 1 < cols)
         {
+            next.row = current.row;
             next.col = current.col + 1;
             if(maze[next.row][next.col] != '#')
             {
@@ -186,11 +188,6 @@ int maze_search(char** maze, int rows, int cols)
                 }
             }
         }
-
-        // time to add backtracking
-        // if at dead end queue will pop to a cell atleast one space away from dead end
-        // if pop with atleast one space inbetween cells delete breadcrumbs
-        //
     }
     backtracking(predecessor, maze, finish, *size);
     return 1;
@@ -226,13 +223,14 @@ void backtracking(Location** predecessor, char** maze, Location finish, int size
     Location back = finish;
     for(int i = 0; i < size; i++)
     {
-        /*if(i == 0)
-        {
-            back = predecessor[finish.row][finish.col];
-            maze[back.row][back.col] = '*';
-        }*/
         back = predecessor[back.row][back.col];
-        // bug with predecessor array: it is not initialized properly
-        maze[back.row][back.col] = '*';
+        if(maze[back.row][back.col] == 'S')
+        {
+            break;
+        }
+        else
+        {
+            maze[back.row][back.col] = '*';
+        }
     }
 }
