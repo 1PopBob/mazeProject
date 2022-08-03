@@ -58,7 +58,6 @@ int main(int argc, char* argv[]) {
     return 0;
 }
 
-
 // Finds the shortest path and returns:
 // 1 if successful
 // 0 if no path exists
