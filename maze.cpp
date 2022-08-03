@@ -87,7 +87,8 @@ int maze_search(char** maze, int rows, int cols)
     Location finish;
     Location *explored = new Location[rows*cols];
     Location **predecessor = new Location*[rows];
-    int startFinish = 0;
+    int s = 0;
+    int f = 0;
 
     for(int i = 0; i < rows; i++)
     {
@@ -105,28 +106,25 @@ int maze_search(char** maze, int rows, int cols)
                 next.col = j;
                 q.add_to_back(next);
                 explored[0] = next;
-                startFinish++;
+                s++;
             }
             if(maze[i][j] == 'F')
             {
                 finish.row = i;
                 finish.col = j;
-                startFinish++;
+                f++;
             }
         }
     }
 
-    if(startFinish < 2)
-    {
-        return 0;
-    }
-    else if(startFinish > 2)
+    if(s != 1 || f != 1)
     {
         return -1;
     }
 
     int exploredIndex = 1;
     int* size = &exploredIndex;
+    // once we find the finish cell the queue will keep poping until empty
     while(!q.is_empty())
     {
         current = q.remove_from_front();
@@ -134,7 +132,7 @@ int maze_search(char** maze, int rows, int cols)
         // west: -1 col
         // south: +1 row
         // east: +1 col
-
+        // when checking a position in the maze we must make sure it exists
         if(current.row - 1 >= 0)
         {
             next.row = current.row - 1;
@@ -147,7 +145,10 @@ int maze_search(char** maze, int rows, int cols)
                     predecessor[next.row][next.col] = current;
                 }
             }
-
+            if(next.row == finish.row && next.col == finish.col)
+            {
+                break;
+            }
         }
         if(current.col - 1 >= 0)
         {
@@ -160,6 +161,10 @@ int maze_search(char** maze, int rows, int cols)
                     q.add_to_back(next);
                     predecessor[next.row][next.col] = current;
                 }
+            }
+            if(next.row == finish.row && next.col == finish.col)
+            {
+                break;
             }
         }
         if(current.row + 1 < rows)
@@ -174,6 +179,10 @@ int maze_search(char** maze, int rows, int cols)
                     predecessor[next.row][next.col] = current;
                 }
             }
+            if(next.row == finish.row && next.col == finish.col)
+            {
+                break;
+            }
         }
         if(current.col + 1 < cols)
         {
@@ -187,9 +196,25 @@ int maze_search(char** maze, int rows, int cols)
                     predecessor[next.row][next.col] = current;
                 }
             }
+            if(next.row == finish.row && next.col == finish.col)
+            {
+                break;
+            }
         }
     }
+    Location valid = explored[exploredIndex - 1];
+    if(valid.row != finish.row || valid.col != finish.col)
+    {
+        return 0;
+    }
     backtracking(predecessor, maze, finish, *size);
+    delete[] explored;
+    for(int i = 0; i < rows; i++)
+    {
+        delete[] predecessor[i];
+    }
+    delete[] predecessor;
+
     return 1;
 }
 
@@ -220,6 +245,8 @@ bool checkDuplicate(Location next, const int* size, Location *explored)
 
 void backtracking(Location** predecessor, char** maze, Location finish, int size)
 {
+    // predecessor of the finish cell will tell us how to go back one step
+    // then that cell's predecessor tells us how to go back another step
     Location back = finish;
     for(int i = 0; i < size; i++)
     {
